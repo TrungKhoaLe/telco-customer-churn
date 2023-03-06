@@ -1233,36 +1233,6 @@ def generate_input_lines():
 app.jinja_env.globals.update(generate_input_lines=generate_input_lines)
 
 
-def get_token():
-    auth_token = os.environ.get("AUTH_TOKEN")
-    auth_username = os.environ.get("AUTH_USERNAME")
-    auth_password = os.environ.get("AUTH_PASSWORD")
-    auth_url = os.environ.get("AUTH_URL")
-
-    if auth_token:
-        # All three are set. bad bad!
-        if auth_username and auth_password:
-            raise EnvironmentError(
-                '[ENV VARIABLES] please set either "AUTH_TOKEN" or ("AUTH_USERNAME", "AUTH_PASSWORD", and "AUTH_URL"). Not both.'
-            )
-        # Only TOKEN is set. good.
-        else:
-            return auth_token
-    else:
-        # Nothing is set. bad!
-        if not (auth_username and auth_password):
-            raise EnvironmentError(
-                '[ENV VARIABLES] please set "AUTH_USERNAME", "AUTH_PASSWORD", and "AUTH_URL" as "TOKEN" is not set.'
-            )
-        # Only USERNAME, PASSWORD are set. good.
-        else:
-            response_preauth = requests.get(auth_url, auth=HTTPBasicAuth(auth_username, auth_password), verify=False)
-            if response_preauth.status_code == 200:
-                return json.loads(response_preauth.text)["accessToken"]
-            else:
-                raise Exception(f"Authentication returned {response_preauth}: {response_preauth.text}")
-
-
 class churnForm:
     @app.route("/", methods=["GET", "POST"])
     def index():
